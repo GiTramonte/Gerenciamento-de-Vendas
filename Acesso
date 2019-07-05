@@ -1,0 +1,77 @@
+unit UAcesso;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, Buttons, DB, ExtCtrls, strutils;
+
+type
+  TFrmAcesso = class(TForm)
+    BitBtn1: TBitBtn;
+    BitBtn2: TBitBtn;
+    Panel1: TPanel;
+    Label3: TLabel;
+    Label4: TLabel;
+    edtusuario: TEdit;
+    edtsenha: TEdit;
+    dsusuarios: TDataSource;
+    procedure BitBtn1Click(Sender: TObject);
+    procedure BitBtn2Click(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FrmAcesso: TFrmAcesso;
+  IP: String[19];
+implementation
+
+Uses Udm, Udmsearch, UFuncoesSystem, UFuncoesDBSystem, UMenuPrincipal;
+
+{$R *.dfm}
+
+procedure TFrmAcesso.BitBtn1Click(Sender: TObject);
+var
+   valdata          : string;
+   mnum, mnumlocal  : integer;
+begin
+   valData :=FormatDateTime('mm/dd/yyyy hh:mm:ss', now);
+   dm.cdstrab.Active:=false;
+   dm.SDSTRAB.CommandText:='select usu_codigo,usu_senha, usu_situacao, grpus_codigo from usuarios where usu_nome = ' + QuotedStr(edtusuario.Text);
+   dm.cdstrab.active:=true;
+if dm.cdstrab.fieldbyname('USU_SITUACAO').Asstring = 'D' then
+   begin
+     mensageminf('Opção inválida, usuário desativado');
+     edtusuario.setfocus;
+   end
+   else
+if dm.cdstrab.IsEmpty then
+   begin
+     mensageminf('Usuário não cadastrado');
+     edtusuario.setfocus;
+   end
+   else
+if edtsenha.text <> dm.cdstrab.fieldbyname('USU_SENHA').Asstring then
+   begin
+     mensageminf('Senha Inválida');
+     edtsenha.setfocus;
+   end
+   else
+   begin
+    frmacesso.Close;
+    frmmenuprincipal.Show;
+   end;
+end;
+procedure TFrmAcesso.BitBtn2Click(Sender: TObject);
+begin
+  Close;
+end;
+procedure TFrmAcesso.FormShow(Sender: TObject);
+begin
+  edtusuario.setfocus;
+end;
+end.
